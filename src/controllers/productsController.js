@@ -1,6 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const { title } = require('process');
+const { v4: uuidv4 } = require('uuid');
+
+const getJson = () => {
+	const productsFilePath = path.join(__dirname, '../data/productsDataBase.json');
+	const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
+	return products;
+}
 
 
 
@@ -18,6 +25,7 @@ const controller = {
 	// Detail - Detail from one product
 	detail: (req, res) => {
 		const {id} = req.params;
+		const products = getJson();
 		const product = products.find(product => product.id == id);
 		res.render('detail', {title:product.name,product,toThousand})
 	},
@@ -29,35 +37,42 @@ const controller = {
 	
 	// Create -  Method to store
 	store: (req, res) => {
-		const newId = products[products.length - 1].id;
+		const id = uuidv4()
 		const {name,price,discount,description,category}= req.body;
+		const file = req.file;
+
+		const products = getJson();
 
 		const newProduct={
-			id: newId + 1,
+			id:uuidv4(),
 			name: name.trim(),
 			price: +price,
 			discount: +discount,
 			category: category,
 			description: description.trim(),
-			image: "default-image.png",
+			image: file ? file.filename : "default.jpg"
 		};
 
 		products.push(newProduct);
-		fs.writeFileSync(productsFilePath,JSON.stringify(products),'utf-8')
-		return res.redirect('/products/detail'+ newProduct.id);
+		const json = JSON.stringify(products);
+		fs.writeFileSync(productsFilePath,json,"utf-8");
+		return res.redirect(`/products/detail/${id}`);
 	},
 
 	// Update - Form to edit
 	edit: (req, res) => {
 		const {id} = req.params;
+		const products = getJson();
 		const product = products.find(product => product.id == id);
 		res.render('product-edit-form', {product,toThousand})
 	},
 
 	// Update - Method to update
+	
 	update: (req, res) => {
 		const {id} = req.params;
 		const {name,price,discount,category,description,image}= req.body;
+		const products = getJson();
 		const nuevoArray = products.map(product =>{
 			if(product.id == id){
 				return{
@@ -80,10 +95,12 @@ const controller = {
 	// Delete - Delete one product from DB
 	destroy : (req, res) => {
 		const {id} = req.params;
-		const nuevaLista = products.filter(product => product.id != id);
+		const products = getJson();
+		const nuevaLista = products.filter(product => product.id !== id);
 		const json = JSON.stringify(nuevaLista);
 		fs.writeFileSync(productsFilePath,json,"utf-8");
-		res.redirect(`/products`);
+		return res.redirect(`/products`);
+
 	}
 };
 
