@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { title } = require('process');
-const { v4: uuidv4 } = require('uuid');
+
 
 const getJson = () => {
 	const productsFilePath = path.join(__dirname, '../data/productsDataBase.json');
@@ -37,14 +37,15 @@ const controller = {
 	
 	// Create -  Method to store
 	store: (req, res) => {
-		const id = uuidv4()
+		const products = getJson();
 		const {name,price,discount,description,category}= req.body;
+		const id = products[products.length-1].id + 1;
 		const file = req.file;
 
-		const products = getJson();
+		
 
 		const newProduct={
-			id:uuidv4(),
+			id:+id,
 			name: name.trim(),
 			price: +price,
 			discount: +discount,
@@ -94,9 +95,11 @@ const controller = {
 
 	// Delete - Delete one product from DB
 	destroy : (req, res) => {
+	
 		const {id} = req.params;
 		const products = getJson();
-		const nuevaLista = products.filter(product => product.id !== id);
+	
+		const nuevaLista = products.filter(product => product.id !== +id);
 		const json = JSON.stringify(nuevaLista);
 		fs.writeFileSync(productsFilePath,json,"utf-8");
 		return res.redirect(`/products`);
