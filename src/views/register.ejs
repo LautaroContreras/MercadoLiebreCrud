@@ -21,8 +21,9 @@
 						<label for="name" class="form-label">Nombre</label>
 						<input type="text" name="name" class="form-input" id="name" placeholder="nombre" value="<%= locals.old && old.name %>">
 						<% if (locals.errors && errors.name) { %>
-							<p class="feedback"><%= errors.name.msg %></p>
+							<p class="feedback"><%=errors.name.msg %></p>
 							<% } %>
+							
 					  </div>
 
 					  <div class="col-12 col-md-6">
@@ -36,8 +37,8 @@
 					<div class="col-12 col-md-6">
 						<label for="email" class="form-label">Correo electrónico</label>
 						<input type="email" name="email" class="form-input" id="email" placeholder="nombre@example.com" value="<%= locals.old && old.email %>">
-						<% if (locals.errors) { %>
-							<p class="feedback"><%= errors.email.msg%></p>
+						<% if (locals.errors && errors.name) { %>
+							<p class="feedback"><%=errors.email.msg %></p>
 							<% } %>
 					  </div>
 
